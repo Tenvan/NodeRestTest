@@ -6,6 +6,8 @@ import {
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
+declare const module: any;
+
 async function bootstrap() {
   // Rest of the code...
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -13,6 +15,10 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  if (module.hot) {
+    module.hot.accept();
+    module.hot.dispose(() => app.close());
+  }
   /**
    * Swagger
    */

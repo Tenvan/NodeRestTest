@@ -16,6 +16,13 @@ export const mockBookings = <Booking[]>[
     value: 1999.99,
     comment: 'Booking 2',
   },
+  {
+    id: 3,
+    fromId: 1,
+    toId: 3,
+    value: 999.99,
+    comment: 'Booking 3',
+  },
 ];
 
 export const mockTypes = <BookingType[]>[
