@@ -4,22 +4,22 @@ import { BookingType } from '../src/models/booking-type';
 export const mockBookings = <Booking[]>[
   {
     id: 1,
-    fromId: 1,
-    toId: 2,
+    from: 1,
+    to: 2,
     value: 1000,
     comment: 'Booking 1',
   },
   {
     id: 2,
-    fromId: 3,
-    toId: 4,
+    from: 3,
+    to: 4,
     value: 1999.99,
     comment: 'Booking 2',
   },
   {
     id: 3,
-    fromId: 1,
-    toId: 3,
+    from: 1,
+    to: 3,
     value: 999.99,
     comment: 'Booking 3',
   },
