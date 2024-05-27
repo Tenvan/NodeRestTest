@@ -20,12 +20,12 @@ export class BookingsController {
 
   @Sse('sse')
   sse(): Observable<MessageEvent> {
-    return interval(100).pipe(
+    return interval(333).pipe(
       map(
         (value) =>
           ({ data: { hello: `world: ${value}`, value } }) as MessageEvent,
       ),
-      takeWhile((ApiTags) => ApiTags.data.value < 10),
+      takeWhile((ApiTags) => ApiTags.data.value < 100),
     );
   }
 }
