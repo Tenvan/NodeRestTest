@@ -15,6 +15,8 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  app.enableCors();
+
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());
