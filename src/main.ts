@@ -23,8 +23,8 @@ async function bootstrap() {
    * Swagger
    */
   const options = new DocumentBuilder()
-    .setTitle('orgaMAX Booking RestServer')
-    .setDescription('RestAPI Server für orgaMAX©')
+    .setTitle('NodeJS Booking RestServer')
+    .setDescription('RestAPI Server for Booking Systems')
     .setVersion('1.0')
     .addTag('Booking')
     .addBearerAuth()
