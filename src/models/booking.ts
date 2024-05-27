@@ -1,30 +1,39 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
-import { Entity, OneToOne, Relation } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BookingType } from './booking-type';
 
-@Entity()
+@Entity('bookings')
 @ObjectType()
 export class Booking {
+  @Column({ nullable: true })
   @Field((type) => String)
   @ApiProperty()
   comment?: string;
 
+  @PrimaryGeneratedColumn()
   @Field((type) => Int)
   @ApiProperty()
   id!: number;
 
+  @Column()
   @Field((type) => Float)
   @ApiProperty()
   value!: number;
 
+  @Column()
   @Field((type) => BookingType)
   @ApiProperty()
-  @OneToOne(() => BookingType, (bookingType) => bookingType.id)
-  from!: number | BookingType;
+  from!: number;
 
+  @Column()
   @Field((type) => BookingType)
   @ApiProperty()
-  @OneToOne((type) => BookingType, (to) => to.id)
-  to!: number | BookingType;
+  to!: number;
 }

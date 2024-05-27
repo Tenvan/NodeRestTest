@@ -2,6 +2,32 @@
     "cSpell.words": [
         "fastify",
         "nestjs",
+        "sqlite",
         "typeorm"
-    ]
+    ],
+    "npm.packageManager": "pnpm",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "Bookings",
+            "database": "data/booking.sqlite"
+        }
+    ],
+    "taskExplorer.enabledTasks": {
+        "ant": false,
+        "batch": false,
+        "gradle": false,
+        "grunt": false,
+        "maven": false,
+        "perl": false,
+        "pipenv": false,
+        "python": false,
+        "ruby": false,
+        "tsc": false
+    },
+    "taskExplorer.enableSideBar": true,
+    "taskExplorer.showExecuteWithArgumentsButton": true,
+    "taskExplorer.showExecuteWithNoTerminalButton": true,
+    "pnpm.runInTerminal": false
 }

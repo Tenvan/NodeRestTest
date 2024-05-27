@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "wraith13.bracket-lens",
+        "usernamehw.errorlens",
+        "dbaeumer.vscode-eslint",
+        "peterschmalfeldt.explorer-exclude"
+    ]
+}

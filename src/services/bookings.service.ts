@@ -1,18 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { filter, from, lastValueFrom, mergeMap } from 'rxjs';
-import { DatabaseService } from '../database/database.service';
+import { Inject, Injectable } from '@nestjs/common';
+import { from, lastValueFrom } from 'rxjs';
+import { FindManyOptions, Repository } from 'typeorm';
+import { Booking } from '../models/booking';
+import { BOOKING_REPOSITORY } from '../models/booking.provider';
 
 @Injectable()
-export class BookingsService {
-  constructor(private readonly databaseService: DatabaseService) {}
+export class BookingService {
+  constructor(
+    @Inject(BOOKING_REPOSITORY)
+    private bookingRepository: Repository<Booking>,
+  ) {}
+
   async getForId(id: number) {
-    const result = from(this.getAll()).pipe(
-      mergeMap((bookings) => from(bookings)),
-      filter((booking) => booking.id === id),
-    );
+    const result = from(this.bookingRepository.findOne({ where: { id } }));
     return lastValueFrom(result);
   }
-  async getAll() {
-    return this.databaseService.getBookings();
+
+  async findAll() {
+    return this.bookingRepository.find();
+  }
+
+  async find(where: FindManyOptions<Booking>) {
+    return this.bookingRepository.find(where);
   }
 }

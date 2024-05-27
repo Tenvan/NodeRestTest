@@ -1,18 +1,25 @@
-import { TestBed } from '@automock/jest';
-import { DatabaseService } from '../database/database.service';
-import { BookingsService } from './bookings.service';
-import { mockBookings } from '../../test/mock.data';
+import { Test } from '@nestjs/testing';
+import { databaseProviders } from '../database/database.providers';
+import { bookingProvider } from '../models/booking.provider';
+import { BookingService } from './bookings.service';
 
 describe('BookingsService', () => {
-  let bookingsService: BookingsService;
+  let bookingsService: BookingService;
 
-  beforeAll(() => {
-    const { unit } = TestBed.create(BookingsService)
-      .mock(DatabaseService)
-      .using({ getBookings: async () => mockBookings })
-      .compile();
+  // beforeAll(() => {
+  //   const { unit } = TestBed.create(BookingService)
+  //     .mock(DatabaseService)
+  //     .using({ getBookings: async () => mockBookings })
+  //     .compile();
 
-    bookingsService = unit;
+  //   bookingsService = unit;
+  // });
+  beforeEach(async () => {
+    const moduleRef = await Test.createTestingModule({
+      providers: [BookingService, bookingProvider, ...databaseProviders],
+    }).compile();
+
+    bookingsService = moduleRef.get<BookingService>(BookingService);
   });
 
   it('should be defined', () => {
@@ -21,18 +28,18 @@ describe('BookingsService', () => {
 
   describe('get data tests', () => {
     it('should get all bookings', async () => {
-      const target = await bookingsService.getAll();
-      expect(target.length).toBe(2);
+      const target = await bookingsService.findAll();
+      expect(target.length).toBe(8);
     });
 
     it('should get booking for id', async () => {
       let target = await bookingsService.getForId(1);
       expect(target).not.toBeNull();
-      expect(target.id).toBe(1);
+      expect(target!.id).toBe(1);
 
       target = await bookingsService.getForId(2);
       expect(target).not.toBeNull();
-      expect(target.id).toBe(2);
+      expect(target!.id).toBe(2);
     });
   });
 });

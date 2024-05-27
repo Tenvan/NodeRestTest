@@ -5,9 +5,8 @@ import { BookingTypeController } from './controllers/booking-type.controller';
 import { BookingsController } from './controllers/bookings.controller';
 import { BookingTypeResolver } from './graphql/resolver/booking-type.resolver';
 import { BookingResolver } from './graphql/resolver/booking.resolver';
-import { BookingTypeService } from './services/booking-type.service';
-import { BookingsService } from './services/bookings.service';
-import { DatabaseService } from './database/database.service';
+import { BookingTypeModule } from './models/booking-type.module';
+import { BookingModule } from './models/booking.module';
 
 @Module({
   imports: [
@@ -21,14 +20,10 @@ import { DatabaseService } from './database/database.service';
         dateScalarMode: 'timestamp',
       },
     }),
+    BookingTypeModule,
+    BookingModule,
   ],
   controllers: [BookingTypeController, BookingsController],
-  providers: [
-    BookingTypeService,
-    BookingsService,
-    BookingResolver,
-    BookingTypeResolver,
-    DatabaseService,
-  ],
+  providers: [BookingResolver, BookingTypeResolver],
 })
 export class AppModule {}
