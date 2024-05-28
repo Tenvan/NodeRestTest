@@ -7,6 +7,7 @@ import { BookingTypeResolver } from './graphql/resolver/booking-type.resolver';
 import { BookingResolver } from './graphql/resolver/booking.resolver';
 import { BookingTypeModule } from './models/booking-type.module';
 import { BookingModule } from './models/booking.module';
+import { EventController } from './controllers/EventController';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { BookingModule } from './models/booking.module';
     BookingTypeModule,
     BookingModule,
   ],
-  controllers: [BookingTypeController, BookingsController],
+  controllers: [BookingTypeController, BookingsController, EventController],
   providers: [BookingResolver, BookingTypeResolver],
 })
 export class AppModule {}
