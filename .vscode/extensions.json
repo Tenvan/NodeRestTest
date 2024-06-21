@@ -3,6 +3,12 @@
         "wraith13.bracket-lens",
         "usernamehw.errorlens",
         "dbaeumer.vscode-eslint",
-        "peterschmalfeldt.explorer-exclude"
+        "peterschmalfeldt.explorer-exclude",
+        "swellaby.node-pack",
+        "firsttris.vscode-jest-runner",
+        "orta.vscode-jest",
+        "aljazsim.tsco",
+        "alefragnani.project-manager",
+        "humao.rest-client"
     ]
 }

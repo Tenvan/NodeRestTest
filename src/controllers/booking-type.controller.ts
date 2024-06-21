@@ -3,16 +3,16 @@ import { ApiTags } from '@nestjs/swagger';
 import { BookingTypeService } from '../services/booking-type.service';
 
 @ApiTags('Booking')
-@Controller('BookingTypes')
+@Controller('bookingType')
 export class BookingTypeController {
   constructor(private readonly bookingTypeService: BookingTypeService) {}
 
-  @Get('GetAllBookings')
+  @Get('getAll')
   getAll() {
     return this.bookingTypeService.getAll();
   }
 
-  @Get('getForId/:id')
+  @Get('getForId')
   getForId(@Query('id') id: number) {
     return this.bookingTypeService.getForId(id);
   }

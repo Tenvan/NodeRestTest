@@ -1,6 +1,8 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GraphQLModule } from '@nestjs/graphql';
+import { EventController } from './controllers/EventController';
 import { BookingTypeController } from './controllers/booking-type.controller';
 import { BookingsController } from './controllers/bookings.controller';
 import { BookingTypeResolver } from './graphql/resolver/booking-type.resolver';
@@ -10,6 +12,12 @@ import { BookingModule } from './models/booking.module';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot({
+      maxListeners: 15,
+      newListener: false,
+      removeListener: false,
+      verboseMemoryLeak: true,
+    }),
     /**
      * Apollo GraphQL
      */
@@ -23,7 +31,7 @@ import { BookingModule } from './models/booking.module';
     BookingTypeModule,
     BookingModule,
   ],
-  controllers: [BookingTypeController, BookingsController],
+  controllers: [BookingTypeController, BookingsController, EventController],
   providers: [BookingResolver, BookingTypeResolver],
 })
 export class AppModule {}

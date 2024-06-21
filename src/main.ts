@@ -3,8 +3,8 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 
 declare const module: any;
 
@@ -15,6 +15,8 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  app.enableCors();
+
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());
@@ -23,8 +25,8 @@ async function bootstrap() {
    * Swagger
    */
   const options = new DocumentBuilder()
-    .setTitle('orgaMAX Booking RestServer')
-    .setDescription('RestAPI Server für orgaMAX©')
+    .setTitle('NodeJS Booking RestServer')
+    .setDescription('RestAPI Server for Booking Systems')
     .setVersion('1.0')
     .addTag('Booking')
     .addBearerAuth()

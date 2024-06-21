@@ -1,12 +1,6 @@
 import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { BookingType } from './booking-type';
 
 @Entity('bookings')
@@ -22,7 +16,7 @@ export class Booking {
   @ApiProperty()
   id!: number;
 
-  @Column()
+  @Column({ type: 'float' })
   @Field((type) => Float)
   @ApiProperty()
   value!: number;
