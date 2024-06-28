@@ -1,4 +1,4 @@
-import { Controller, Query, Sse } from '@nestjs/common';
+import { Controller, ParseIntPipe, Query, Sse } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ApiTags } from '@nestjs/swagger';
 import {
@@ -25,24 +25,28 @@ export class EventController {
   @Sse('worldTickerEvent')
   worldTickerEvent(
     @Query('name') name: string,
-    @Query('count') count: number,
-    @Query('ticks') ticks: number,
+    @Query('start', ParseIntPipe) start: number,
+    @Query('count', ParseIntPipe) count: number,
+    @Query('ticks', ParseIntPipe) ticks: number,
   ): Observable<MessageEvent> {
     console.log(
       'register worldTickerEvent',
-      `name:${name} count:${count} ticks:${ticks}`,
+      `name:${name} from:${start} to:${count} ticks:${ticks}`,
     );
     return interval(ticks).pipe(
       tap((value) => {
         this.appEventEmitter.emit('appEvents', { value, name });
       }),
+      takeWhile((value) => {
+        console.log('value', value, start, count);
+        return value < count;
+      }),
       map(
         (value) =>
           ({
-            data: { event: `${name}.raised`, payload: value },
+            data: { event: `${name}.raised`, payload: value + start },
           }) as MessageEvent,
       ),
-      takeWhile((eventData) => eventData.data.payload < count),
     );
   }
 
