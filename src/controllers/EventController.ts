@@ -1,4 +1,4 @@
-import { Controller, ParseIntPipe, Query, Sse } from '@nestjs/common';
+import { Controller, Logger, ParseIntPipe, Query, Sse } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ApiTags } from '@nestjs/swagger';
 import {
@@ -16,9 +16,13 @@ import {
 export class EventController {
   private appEventSubject = new Subject<any>();
 
+  // 1. Injizieren Sie den Logger-Service
+  private logger = new Logger(EventController.name);
+
   constructor(private appEventEmitter: EventEmitter2) {
     this.appEventEmitter.on('appEvents', (data) => {
       this.appEventSubject.next(data);
+      this.logger.log(`Event received: ${JSON.stringify(data)}`);
     });
   }
 
@@ -29,16 +33,13 @@ export class EventController {
     @Query('count', ParseIntPipe) count: number,
     @Query('ticks', ParseIntPipe) ticks: number,
   ): Observable<MessageEvent> {
-    console.log(
+    this.logger.log(
       'register worldTickerEvent',
       `name:${name} from:${start} to:${count} ticks:${ticks}`,
     );
     return interval(ticks).pipe(
-      tap((value) => {
-        this.appEventEmitter.emit('appEvents', { value, name });
-      }),
       takeWhile((value) => {
-        console.log('value', value, start, count);
+        this.logger.log('value', value, start, count);
         return value < count;
       }),
       map(
@@ -47,6 +48,9 @@ export class EventController {
             data: { event: `${name}.raised`, payload: value + start },
           }) as MessageEvent,
       ),
+      tap((value) => {
+        this.appEventEmitter.emit('appEvents', { value, name });
+      }),
     );
   }
 
