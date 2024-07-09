@@ -1,9 +1,11 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import {
+  FastifyAdapter,
+  type NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs'; // Import the fs module
-import * as spdy from 'spdy';
-import type { AddressInfo } from 'net';
 import { AppModule } from './app.module';
 import { CustomLoggerService } from './services/logger.service';
 import path = require('node:path');
@@ -13,9 +15,14 @@ declare const module: any;
 async function bootstrap() {
   const logger = new Logger('Main');
 
-  const app = await NestFactory.create(AppModule, {
-    logger: new CustomLoggerService(),
-  });
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+    {
+      logger: new CustomLoggerService(),
+    },
+  );
+
   app.enableCors();
   app.enableShutdownHooks();
 
@@ -33,36 +40,15 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('api', app, document);
 
-  const serverOptions = {
-    key: fs.readFileSync(path.join(__dirname, '../Cert/test.key')),
-    cert: fs.readFileSync(path.join(__dirname, '../Cert/test.crt')),
-    // Weitere Optionen können hier konfiguriert werden
-    allowHTTP1: true, // Ermöglicht dem Server, HTTP/1.1-Fallback zu handhaben
-  };
-
-  // Erstellen Sie einen HTTP/2-Server und übergeben Sie die Express-Instanz von NestJS
-  const server = spdy.createServer(
-    serverOptions,
-    app.getHttpAdapter().getInstance(),
-  );
-
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());
   }
 
-  const port = 3000; // Definieren Sie den Port, auf dem Ihr Server laufen soll
-
-  await app.listen(port, '127.0.0.1');
+  const port = 3000;
+  await app.listen(port);
   const serverAdress = await app.getUrl();
   logger.log(`Application is running on: ${serverAdress}`);
-
-  server.listen(port + 1, '127.0.0.1', () => {
-    const serverAdress = server.address() as AddressInfo;
-    logger.log(
-      `Application is running on: (${serverAdress.family}) ${serverAdress.address}:${serverAdress.port}`,
-    );
-  });
 }
 
 bootstrap();
