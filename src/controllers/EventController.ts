@@ -31,7 +31,6 @@ export class EventController implements OnModuleInit, OnModuleDestroy {
 
   private appEventSubject = new Subject<any>();
   private id = 0;
-  // 1. Injizieren Sie den Logger-Service
   private logger = new Logger(EventController.name);
   private stream: {
     id: string;
@@ -57,7 +56,7 @@ export class EventController implements OnModuleInit, OnModuleDestroy {
 
   // #region Public Methods (5)
 
-  @Sse('appEventsEndpoint')
+  @Sse('sseAppEvents')
   public appEvents(): Observable<any> {
     return fromEvent(this.appEventEmitter, 'appEvents').pipe(
       map((data) => {
@@ -68,8 +67,8 @@ export class EventController implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  @Sse('sseTicker')
-  public sseTicker(@Res() response: FastifyReply): Observable<MessageEvent> {
+  @Sse('sseAppTicker')
+  public appTicker(@Res() response: FastifyReply): Observable<MessageEvent> {
     this.logger.warn(`start sseTicker`);
 
     const id = EventController.genStreamId();
@@ -99,8 +98,8 @@ export class EventController implements OnModuleInit, OnModuleDestroy {
     );
   }
 
-  @Sse('worldTickerEvent')
-  public worldTickerEvent(
+  @Sse('sseClientTicker')
+  public clientTicker(
     @Res() response: FastifyReply,
     @Query('name') name: string,
     @Query('start', ParseIntPipe) start: number,
