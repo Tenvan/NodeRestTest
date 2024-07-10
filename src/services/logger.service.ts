@@ -1,5 +1,6 @@
 import { Injectable, LoggerService } from '@nestjs/common';
 import * as winston from 'winston';
+import clc = require('cli-color');
 
 @Injectable()
 export class CustomLoggerService implements LoggerService {
@@ -14,25 +15,30 @@ export class CustomLoggerService implements LoggerService {
   constructor() {
     this.logger = winston.createLogger({
       level: 'debug',
-      format: winston.format.combine(
-        winston.format.colorize({
-          all: true,
-          colors: {
-            info: 'blue',
-            error: 'red',
-            warn: 'yellow',
-            debug: 'green',
-          },
-        }),
-        winston.format.timestamp(),
-        winston.format.printf(({ level, message, timestamp }) => {
-          return `${timestamp} ${level}: ${message}`;
-        }),
-        // winston.format.json(),
-      ),
       transports: [
-        new winston.transports.Console(),
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.colorize({
+              all: true,
+              colors: {
+                info: 'blue',
+                error: 'red',
+                warn: 'yellow',
+                debug: 'green',
+              },
+            }),
+            winston.format.timestamp(),
+            winston.format.printf(({ level, message, timestamp }) => {
+              return `${clc.yellowBright(timestamp)} ${level}: ${message}`;
+            }),
+            // winston.format.json(),
+          ),
+        }),
         // Hier können Sie weitere Transports hinzufügen, z.B. eine Datei
+        new winston.transports.File({
+          filename: 'logs/combined.log',
+          format: winston.format.json(),
+        }),
       ],
     });
   }
