@@ -57,43 +57,75 @@ export class EventController implements OnModuleInit, OnModuleDestroy {
   // #region Public Methods (5)
 
   @Sse('sseAppEvents')
-  public appEvents(): Observable<any> {
-    return fromEvent(this.appEventEmitter, 'appEvents').pipe(
-      map((data) => {
-        return {
-          data: { event: 'appEvents.raised', payload: data },
-        } as MessageEvent;
-      }),
-    );
-  }
-
-  @Sse('sseAppTicker')
-  public appTicker(@Res() response: FastifyReply): Observable<MessageEvent> {
-    this.logger.warn(`start sseTicker`);
-
+  public appEvents(
+    @Res() response: FastifyReply,
+    @Query('name') name: string,
+  ): Observable<any> {
     const id = EventController.genStreamId();
+
+    this.logger.debug(`start sseAppEvents: ${name} | ${id}`);
+
     // Clean up the stream when the client disconnects
     response.raw.on('close', () => {
-      this.logger.warn(`finished sseTicker`);
+      this.logger.debug(`finished sseAppEvents: ${name} | ${id}`);
 
       return this.removeStream(id);
     });
+
     // Create a new stream
     const subject = new ReplaySubject();
-    const observer = subject.asObservable();
+    const observer = fromEvent(this.appEventEmitter, 'appEvents');
+
     this.addStream(subject, observer, id);
 
     return observer.pipe(
       map(
         (data) =>
           ({
-            id: `my-stream-id:${id}`,
-            data: `Hello world ${data}`,
-            event: 'my-event-name',
-          }) as unknown as MessageEvent,
+            data: {
+              id: `${id}`,
+              event: `appEvents.${name}.raised`,
+              payload: data,
+            },
+          }) as MessageEvent,
+      ),
+    );
+  }
+
+  @Sse('sseAppTicker')
+  public appTicker(
+    @Res() response: FastifyReply,
+    @Query('name') name: string,
+  ): Observable<MessageEvent> {
+    const id = EventController.genStreamId();
+
+    this.logger.debug(`start sseAppTicker: ${name} | ${id}`);
+
+    // Clean up the stream when the client disconnects
+    response.raw.on('close', () => {
+      this.logger.debug(`finished sseAppTicker: ${name} | ${id}`);
+
+      return this.removeStream(id);
+    });
+
+    const subject = new ReplaySubject();
+    const observer = subject.asObservable();
+
+    this.addStream(subject, observer, id);
+
+    return observer.pipe(
+      map(
+        (data) =>
+          ({
+            data: {
+              id: `${id}`,
+              event: `sseAppTicker.${name}.raised`,
+              payload: { message: `Ticker ${data}`, data },
+            },
+          }) as MessageEvent,
       ),
       tap((value) => {
-        this.appEventEmitter.emit('sseTicker', { value, name });
+        this.appEventEmitter.emit('appEvents', { value, name });
       }),
     );
   }
@@ -106,19 +138,24 @@ export class EventController implements OnModuleInit, OnModuleDestroy {
     @Query('count', ParseIntPipe) count: number,
     @Query('ticks', ParseIntPipe) ticks: number,
   ): Observable<MessageEvent> {
-    this.logger.warn(
-      `start worldTicker: ${name} | ${start} | ${count} | ${ticks}`,
+    const id = EventController.genStreamId();
+
+    this.logger.debug(
+      `start sseClientTicker: ${name} | ${start} | ${count} | ${ticks}`,
     );
 
-    const id = EventController.genStreamId();
     // Clean up the stream when the client disconnects
-    response.raw.on('close', () => this.removeStream(id));
+    response.raw.on('close', () => {
+      this.logger.debug(`finished sseClientTicker: ${name} | ${id}`);
+
+      return this.removeStream(id);
+    });
     // Create a new stream
     const subject = new ReplaySubject();
-    const observer = subject.asObservable();
+    const observer = interval(ticks);
     this.addStream(subject, observer, id);
 
-    return interval(ticks).pipe(
+    return observer.pipe(
       takeWhile((value) => value < count),
       map(
         (value) =>
@@ -127,12 +164,12 @@ export class EventController implements OnModuleInit, OnModuleDestroy {
           }) as MessageEvent,
       ),
       tap((value) => {
-        this.appEventEmitter.emit('worldTicker', { value, name });
+        this.appEventEmitter.emit('appEvents', { value, name });
       }),
       finalize(() => {
         // Führen Sie hier Ihre Abschlussaktionen durch
         this.logger.warn(
-          `finished worldTicker: ${name} | ${start} | ${count} | ${ticks}`,
+          `finished sseClientTicker: ${name} | ${start} | ${count} | ${ticks}`,
         );
       }),
     );
